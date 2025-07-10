@@ -29,51 +29,8 @@ load_dotenv()
 # Global embedding cache to avoid repeated API calls for the same model names
 _embedding_cache: Dict[str, np.ndarray] = {}
 
-# Global distance mode setting
-DISTANCE_MODE = "embedding"  # Options: "embedding", "score", "hybrid"
-
-def set_distance_mode(mode: str):
-    """
-    Set the global distance mode for clustering algorithms.
-    
-    Args:
-        mode: Distance mode - "embedding", "score", or "hybrid"
-    """
-    global DISTANCE_MODE
-    valid_modes = ["embedding", "score", "hybrid"]
-    if mode not in valid_modes:
-        raise ValueError(f"Invalid distance mode '{mode}'. Valid modes: {valid_modes}")
-    
-    DISTANCE_MODE = mode
-    print(f"Distance mode set to: {mode}")
-
-def get_recommended_min_distance(ensemble_data: List[Tuple[float, str]], mode: str = None) -> float:
-    """
-    Get recommended minimum distance based on the distance mode and data characteristics.
-    
-    Args:
-        ensemble_data: The data to analyze
-        mode: Distance mode (if None, uses global DISTANCE_MODE)
-        
-    Returns:
-        Recommended minimum distance value
-    """
-    if mode is None:
-        mode = DISTANCE_MODE
-    
-    if mode == "embedding":
-        # For embedding distance (0-2 range), recommend smaller values
-        return 0.3
-    elif mode == "score":
-        # For score-based distance, analyze the score range
-        scores = [float(point[0]) for point in ensemble_data if isinstance(point[0], (int, float)) or str(point[0]).replace('.', '').isdigit()]
-        if scores:
-            score_range = max(scores) - min(scores)
-            return score_range * 0.1  # 10% of the score range
-        else:
-            return 10.0  # Default fallback
-    else:  # hybrid
-        return 5.0  # Balanced value
+# Distance mode - can be "numerical_distance" or "embedding_distance"
+DISTANCE_MODE = "embedding_distance"
 
 def configure_gemini_api(api_key: str = ""):
     """
@@ -104,27 +61,19 @@ def get_embedding(text: str, model_name: str = "models/embedding-001") -> np.nda
     if text in _embedding_cache:
         return _embedding_cache[text]
     
-    try:
-        # Generate embedding using Gemini
-        result = genai.embed_content(
-            model=model_name,
-            content=text,
-            task_type="semantic_similarity"
-        )
-        
-        embedding = np.array(result['embedding'])
-        
-        # Cache the result
-        _embedding_cache[text] = embedding
-        
-        return embedding
-        
-    except Exception as e:
-        print(f"Error getting embedding for '{text}': {e}")
-        # Fallback: return a random embedding vector
-        fallback_embedding = np.random.randn(768)  # Typical embedding dimension
-        _embedding_cache[text] = fallback_embedding
-        return fallback_embedding
+    # Generate embedding using Gemini
+    result = genai.embed_content(
+        model=model_name,
+        content=text,
+        task_type="semantic_similarity"
+    )
+    
+    embedding = np.array(result['embedding'])
+    
+    # Cache the result
+    _embedding_cache[text] = embedding
+    
+    return embedding
 
 def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
     """
@@ -414,42 +363,21 @@ def assign_to_clusters(ensemble_data: List[Tuple[float, str]], centers: List[Tup
     
     return clusters
 
-def distance(p1: Tuple[float, str], p2: Tuple[float, str], mode: str = None) -> float:
+def numerical_distance(p1: Tuple[float, str], p2: Tuple[float, str]) -> float:
     """
-    Distance between two points using different distance modes.
-    
-    Args:
-        p1, p2: Tuples of (score, model_name)
-        mode: Distance mode - "embedding", "score", or "hybrid" (if None, uses global DISTANCE_MODE)
-        
-    Returns:
-        Distance value (range depends on mode)
+    Distance between two points using absolute difference of scores.
     """
-    if mode is None:
-        mode = DISTANCE_MODE
-    
-    if mode == "score":
-        return score_distance(p1, p2)
-    elif mode == "embedding":
-        return embedding_distance(p1, p2)
-    elif mode == "hybrid":
-        # Weighted combination of both distances
-        score_dist = score_distance(p1, p2)
-        embed_dist = embedding_distance(p1, p2)
-        # Normalize and combine (50-50 weight)
-        return 0.5 * (score_dist / 10.0) + 0.5 * embed_dist
-    else:
-        raise ValueError(f"Invalid distance mode: {mode}")
+    return abs(float(p1[0]) - float(p2[0]))
 
 def embedding_distance(p1: Tuple[float, str], p2: Tuple[float, str]) -> float:
     """
-    Calculate distance using cosine similarity of model name embeddings.
+    Distance between two points using cosine similarity of their model name embeddings.
     
     Args:
         p1, p2: Tuples of (score, model_name)
         
     Returns:
-        Distance value between 0 and 2
+        Distance value where 0 means identical and 2 means completely opposite
     """
     try:
         # Get embeddings for the model names
@@ -467,25 +395,35 @@ def embedding_distance(p1: Tuple[float, str], p2: Tuple[float, str]) -> float:
         
     except Exception as e:
         print(f"Warning: Error calculating embedding distance between '{p1[1]}' and '{p2[1]}': {e}")
-        return 1.0  # Default moderate distance
+        
+        # Fallback: use the original score-based distance
+        try:
+            score1 = float(p1[0])
+            score2 = float(p2[0])
+            return abs(score1 - score2) / 100.0  # Normalize to similar range as cosine distance
+        except (ValueError, TypeError):
+            print(f"Warning: Could not convert scores '{p1[0]}' or '{p2[0]}' to numbers")
+            return 1.0  # Default moderate distance
 
-def score_distance(p1: Tuple[float, str], p2: Tuple[float, str]) -> float:
+def distance(p1: Tuple[float, str], p2: Tuple[float, str]) -> float:
     """
-    Calculate distance using absolute difference of scores.
+    Unified distance function that switches between modes based on DISTANCE_MODE.
     
     Args:
         p1, p2: Tuples of (score, model_name)
         
     Returns:
-        Absolute difference between scores
+        Distance value based on the current DISTANCE_MODE
     """
-    try:
-        score1 = float(p1[0])
-        score2 = float(p2[0])
-        return abs(score1 - score2)
-    except (ValueError, TypeError):
-        print(f"Warning: Could not convert scores '{p1[0]}' or '{p2[0]}' to numbers")
-        return 0.0  # Default to no distance if scores can't be compared
+    global DISTANCE_MODE
+    
+    if DISTANCE_MODE == "embedding_distance":
+        return embedding_distance(p1, p2)
+    elif DISTANCE_MODE == "numerical_distance":
+        return numerical_distance(p1, p2)
+    else:
+        print(f"Warning: Unknown distance mode '{DISTANCE_MODE}', using numerical_distance")
+        return numerical_distance(p1, p2)
 
 def plot_clustering_results(ensemble_data: List[Tuple[float, str]], 
                           clusters: List[Tuple[Tuple[float, str], Tuple[Tuple[float, str], ...]]], 
@@ -606,7 +544,7 @@ def plot_clustering_results(ensemble_data: List[Tuple[float, str]],
     
     ax2.set_xlabel('Score')
     ax2.set_ylabel('Frequency (Quantity)')
-    ax2.set_title(f'After {title}\n{len(clusters)} Clusters (min_distance={min_distance})')
+    ax2.set_title(f'After {title}\n{len(clusters)} Clusters (min_distance={min_distance}, mode={DISTANCE_MODE})')
     ax2.grid(True, alpha=0.3, axis='y')
     ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     
@@ -753,65 +691,56 @@ if __name__ == "__main__":
         print(f"Warning: {e}")
         print("Using fallback distance calculation without embeddings")
 
+    JSON_FILE_TO_USE = "test_jsons/model_responses.json"
+
     # Create unique trial folder for this experiment run
     trial_folder = create_trial_folder()
 
-    test_data = json.load(open("test2.json"))
-    print(f"Loaded {len(test_data)} data points")
+    test_data = json.load(open(JSON_FILE_TO_USE))
+    print(test_data)
     
-    # Generate test data with N ensembles (alternative)
-    # N = 20
-    # test_data = generate_test_data(N=N, value_range=(0, 100))
+    # Generate test data with N ensembles
+    N = 20
+    #test_data = generate_test_data(N=N, value_range=(0, 100))
+    
+    # print("Generated Test Data:")
+    # for i, (score, name) in enumerate(sorted(test_data, key=lambda x: x[0])):
+    #     print(f"{i+1:2d}. {score:6.2f} - {name}")
     
     # Create model distribution plots first
     plot_model_distributions(test_data, trial_folder, x_max=100)
     
-    # Test different distance modes
-    distance_modes = ["embedding", "score", "hybrid"]
+    # Perform repulsive sampling
+    if DISTANCE_MODE == "":
+        min_distance = 10.0
+    else:
+        # embedding distance is typically 0-2, so we need to scale it down
+        min_distance = 0.1
+
+    print(f"Using min_distance={min_distance} for {DISTANCE_MODE} mode")
     
-    print("\n" + "="*60)
-    print("COMPARING DIFFERENT DISTANCE MODES")
-    print("="*60)
+    # Perform repulsive sampling
+    centers = repulsive_sampling(test_data, min_distance=min_distance)
     
-    for mode in distance_modes:
-        print(f"\n--- Testing {mode.upper()} distance mode ---")
-        
-        # Set the distance mode
-        set_distance_mode(mode)
-        
-        # Get recommended minimum distance for this mode
-        recommended_min_dist = get_recommended_min_distance(test_data, mode)
-        print(f"Recommended min_distance for {mode} mode: {recommended_min_dist:.3f}")
-        
-        # Sample a few distances to show typical values
-        if len(test_data) >= 5:
-            print(f"Sample distances in {mode} mode:")
-            for i in range(min(3, len(test_data)-1)):
-                for j in range(i+1, min(i+3, len(test_data))):
-                    dist = distance(test_data[i], test_data[j], mode)
-                    print(f"  {test_data[i][1][:20]:20} <-> {test_data[j][1][:20]:20}: {dist:.3f}")
-        
-        # Use recommended distance for clustering
-        min_distance = recommended_min_dist
-        
-        # Perform repulsive sampling
-        centers = repulsive_sampling(test_data, min_distance=min_distance)
-        clusters = assign_to_clusters(test_data, centers)
-        
-        # Plot results with mode in title
-        plot_clustering_results(test_data, clusters, min_distance, 
-                              f"Repulsive Clustering ({mode.capitalize()} Distance)", trial_folder)
-        
-        # Show DPP sampling
-        dpp_centers = dpp_sampling(test_data, k=len(centers), sigma=15.0)
-        dpp_clusters = assign_to_clusters(test_data, dpp_centers)
-        plot_clustering_results(test_data, dpp_clusters, min_distance, 
-                              f"DPP Clustering ({mode.capitalize()} Distance)", trial_folder)
-        
-        print(f"Results for {mode} mode: {len(clusters)} clusters created")
+    # Assign points to clusters
+    clusters = assign_to_clusters(test_data, centers)
+    
+    # Plot results
+    plot_clustering_results(test_data, clusters, min_distance, "Repulsive Clustering", trial_folder)
+
+    # Show DPP sampling
+    dpp_centers = dpp_sampling(test_data, k=len(centers), sigma=15.0)
+    dpp_clusters = assign_to_clusters(test_data, dpp_centers)
+    plot_clustering_results(test_data, dpp_clusters, min_distance, "DPP Clustering", trial_folder)
+    
+    # Show random sampling
+    random_centers = random_sampling(test_data, k=len(centers))
+    random_clusters = assign_to_clusters(test_data, random_centers)
+    plot_clustering_results(test_data, random_clusters, min_distance, "Random Clustering", trial_folder)
+
+    # Show nearest sampling
+    nearest_centers = nearest_sampling(test_data, k=len(centers))
+    nearest_clusters = assign_to_clusters(test_data, nearest_centers)
+    plot_clustering_results(test_data, nearest_clusters, min_distance, "Nearest Clustering", trial_folder)
     
     print(f"\nAll results saved to: {trial_folder}")
-    print("\nTo easily switch between distance modes in your own code:")
-    print("  set_distance_mode('embedding')  # Use embedding-based distance")
-    print("  set_distance_mode('score')      # Use score-based distance") 
-    print("  set_distance_mode('hybrid')     # Use combination of both")
