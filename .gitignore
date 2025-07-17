@@ -13,3 +13,5 @@ results/
 
 # secret keys
 .env
+
+uv.lock
