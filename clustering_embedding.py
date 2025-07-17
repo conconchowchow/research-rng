@@ -57,6 +57,27 @@ def embedding_distance(p1: Tuple[np.ndarray, str], p2: Tuple[np.ndarray, str]) -
     return distance_value
 
 def repulsive_sampling_embedding(ensemble_data: List[Tuple[np.ndarray, str]], min_distance: float = 0.5) -> List[Tuple[np.ndarray, str]]:
+    desired_num_clusters = len(ensemble_data) // 2
+
+    min_distance = 1.
+
+    centers = []
+
+    print((f"Desired number of clusters: {desired_num_clusters}, starting with min_distance: {min_distance}, desired_num_clusters: {desired_num_clusters}"))
+
+    # Find the minimum_distance that yields the desired number of clusters:
+    while len(centers) < desired_num_clusters:
+        print(f"Trying min_distance: {min_distance}")
+        centers = repulsive_sampling_embedding_impl(ensemble_data, min_distance)
+        if len(centers) == desired_num_clusters:
+            break
+        min_distance -= 0.05
+
+    print(f"Final number of clusters: {len(centers)}")
+    
+    return centers
+
+def repulsive_sampling_embedding_impl(ensemble_data: List[Tuple[np.ndarray, str]], min_distance: float = 0.5) -> List[Tuple[np.ndarray, str]]:
     """
     Repulsive sampling for embedding data: Select cluster centers that are at least min_distance apart.
     

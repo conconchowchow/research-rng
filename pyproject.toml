@@ -9,5 +9,20 @@ dependencies = [
     "google-generativeai>=0.8.0",
     "numpy>=1.21.0",
     "matplotlib",
-    "dotenv"
+    "dotenv",
+    "litellm",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "httpx",
+    "tqdm",
+    "jupyter",
+    "ipywidgets",
+    "aiofiles",
+    "python-dotenv"
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
 ]
