@@ -3,16 +3,10 @@ from litellm import completion, batch_completion
 
 from httpx import HTTPStatusError
 from litellm.exceptions import NotFoundError
-import pandas as pd
-import matplotlib.pyplot as plt
 import json
-from collections import defaultdict
-from tqdm.notebook import tqdm
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 from openai import OpenAI
-import json
-import uuid
 import os
 from dotenv import load_dotenv
 from typing import List, Tuple
