@@ -1,0 +1,162 @@
+[
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "claude-3-opus-20240229",
+    "prompt_tokens: 41",
+    "reasoning_tokens: N/A",
+    "completion_tokens: 5",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ]
+]

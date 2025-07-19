@@ -1,0 +1,162 @@
+[
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 512",
+    "completion_tokens: 525",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 320",
+    "completion_tokens: 333",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 384",
+    "completion_tokens: 397",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 320",
+    "completion_tokens: 333",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 576",
+    "completion_tokens: 589",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 256",
+    "completion_tokens: 269",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 640",
+    "completion_tokens: 653",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 448",
+    "completion_tokens: 461",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 576",
+    "completion_tokens: 589",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 448",
+    "completion_tokens: 461",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 512",
+    "completion_tokens: 525",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 192",
+    "completion_tokens: 205",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 320",
+    "completion_tokens: 333",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 192",
+    "completion_tokens: 203",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 384",
+    "completion_tokens: 397",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 192",
+    "completion_tokens: 205",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 320",
+    "completion_tokens: 331",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 192",
+    "completion_tokens: 205",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 576",
+    "completion_tokens: 589",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ],
+  [
+    "o1-mini-2024-09-12",
+    "prompt_tokens: 51",
+    "reasoning_tokens: 320",
+    "completion_tokens: 333",
+    "temperature: 1",
+    "messages: [{\"role\": \"system\", \"content\": \"You are an assistant who follows the user's request exactly as they state.\"}, {\"role\": \"user\", \"content\": \"generate me a random number from [0,10] inclusive. Only output a single number:\"}]"
+  ]
+]
