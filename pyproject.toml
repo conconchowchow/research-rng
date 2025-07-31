@@ -20,7 +20,9 @@ dependencies = [
     "ipywidgets",
     "aiofiles",
     "python-dotenv",
-    "umap-learn"
+    "umap-learn",
+    "llvmlite",
+    "numba"
 ]
 
 [dependency-groups]
