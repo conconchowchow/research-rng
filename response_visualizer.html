@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Visualizer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .file-input-label:hover {
+            background: #5a6fd8;
+        }
+
+        .file-info {
+            margin-top: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .tabs {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .load-new-file {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        .load-new-file:hover {
+            background: #218838;
+        }
+
+        .response-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .response-header {
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .response-content {
+            padding: 20px;
+        }
+
+        .response-text {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            line-height: 1.8;
+        }
+
+        .model-info {
+            background: #e7f3ff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #0066cc;
+        }
+
+        .model-info strong {
+            color: #004499;
+        }
+
+        .cluster-controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .cluster-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 250px;
+            margin-left: 10px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .cluster-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #bee5eb;
+        }
+
+        #umapChart {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        .response-preview {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            max-width: 400px;
+            z-index: 1000;
+            pointer-events: none;
+            line-height: 1.4;
+        }
+
+        .response-preview .model-name {
+            font-weight: bold;
+            color: #ffeb3b;
+            margin-bottom: 5px;
+        }
+
+        .response-preview .response-text {
+            color: #fff;
+            max-height: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .umap-point {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .umap-point:hover {
+            stroke-width: 3px;
+            stroke: #000;
+        }
+
+        .umap-center {
+            stroke: #000;
+            stroke-width: 2px;
+        }
+
+        .umap-legend {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .legend-star {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Response Visualizer</h1>
+            <p>Upload and analyze JSON response logs with clustering visualization</p>
+        </div>
+
+        <div id="uploadSection" class="upload-section">
+            <h2>Upload JSON Log File</h2>
+            <p>Select a JSON log file generated by the response generator to visualize the responses and clusters.</p>
+            
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" class="file-input" accept=".json" />
+                <label for="fileInput" class="file-input-label">Choose JSON File</label>
+            </div>
+            
+            <div id="fileInfo" class="file-info"></div>
+        </div>
+
+        <div id="visualizerTabs" class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('allResponses')">All Responses</button>
+                <button class="tab-button" onclick="showTab('clusterView')">Cluster View</button>
+                <button class="tab-button" onclick="showTab('umapView')">UMAP Visualization</button>
+            </div>
+
+            <div id="allResponses" class="tab-content active">
+                <div id="summaryStats" class="summary-stats"></div>
+                <div id="allResponsesContent"></div>
+            </div>
+
+            <div id="clusterView" class="tab-content">
+                <div class="cluster-controls">
+                    <label for="clusterSelect"><strong>Select Cluster:</strong></label>
+                    <select id="clusterSelect" class="cluster-select">
+                        <option value="">Choose a cluster...</option>
+                    </select>
+                </div>
+                <div id="clusterInfo" class="cluster-info" style="display: none;"></div>
+                <div id="clusterContent"></div>
+            </div>
+
+            <div id="umapView" class="tab-content">
+                <div id="umapControls" class="cluster-controls">
+                    <h3>Interactive UMAP Visualization</h3>
+                    <p>Hover over points to see response previews. Centers are marked with stars (★).</p>
+                </div>
+                <div id="umapChart"></div>
+                <div id="responsePreview" class="response-preview" style="display: none;"></div>
+            </div>
+        </div>
+
+        <button id="loadNewFile" class="load-new-file" style="display: none;" onclick="loadNewFile()">
+            Load New JSON File
+        </button>
+    </div>
+
+    <script>
+        let currentData = null;
+        let clusters = {};
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        document.getElementById('clusterSelect').addEventListener('change', handleClusterSelect);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileInfo').textContent = `Selected: ${file.name}`;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    processJsonData(jsonData);
+                } catch (error) {
+                    showError('Invalid JSON file. Please check the file format.');
+                    console.error('JSON parsing error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processJsonData(data) {
+            currentData = data;
+            
+            // Create clusters based on model types (since actual cluster data isn't in JSON)
+            createClusters(data.responses);
+            
+            // Show the tabs and hide upload section
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('visualizerTabs').style.display = 'block';
+            document.getElementById('loadNewFile').style.display = 'block';
+            
+            // Populate the interface
+            populateSummaryStats(data);
+            populateAllResponses(data.responses);
+            populateClusterSelect();
+            
+            // Initialize UMAP visualization if clustering data is available
+            if (data.clustering_data && data.clustering_data.points) {
+                initializeUmapVisualization(data.clustering_data);
+            } else {
+                // Show message in UMAP tab if no data is available
+                const umapChart = document.getElementById('umapChart');
+                umapChart.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #666;">
+                        <h3>No UMAP Data Available</h3>
+                        <p>This JSON file was generated before UMAP clustering was implemented.</p>
+                        <p>Please generate responses again with the updated generator to see UMAP visualization.</p>
+                    </div>
+                `;
+            }
+            
+            showTab('allResponses');
+        }
+
+        function createClusters(responses) {
+            // Group responses by model type as a clustering approximation
+            clusters = {};
+            const modelGroups = {};
+            
+            responses.forEach((response, index) => {
+                const modelName = response.metadata.model_config.model_name;
+                if (!modelGroups[modelName]) {
+                    modelGroups[modelName] = [];
+                }
+                modelGroups[modelName].push({...response, originalIndex: index});
+            });
+
+            // Convert model groups to numbered clusters
+            let clusterIndex = 1;
+            Object.keys(modelGroups).forEach(modelName => {
+                clusters[`Cluster ${clusterIndex}`] = {
+                    responses: modelGroups[modelName],
+                    dominantModel: modelName,
+                    count: modelGroups[modelName].length
+                };
+                clusterIndex++;
+            });
+        }
+
+        function populateSummaryStats(data) {
+            const statsContainer = document.getElementById('summaryStats');
+            const totalResponses = data.responses.length;
+            const uniqueModels = new Set(data.responses.map(r => r.metadata.model_config.model_name)).size;
+            
+            // Use clustering data if available, otherwise fall back to model-based clusters
+            let totalClusters = Object.keys(clusters).length;
+            let hasUmapData = false;
+            
+            if (data.clustering_data && data.clustering_data.num_clusters) {
+                totalClusters = data.clustering_data.num_clusters;
+                hasUmapData = data.clustering_data.points && data.clustering_data.points.length > 0;
+            }
+            
+            const avgResponseLength = Math.round(
+                data.responses.reduce((sum, r) => sum + r.response.length, 0) / totalResponses
+            );
+
+            let statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-number">${totalResponses}</div>
+                    <div class="stat-label">Total Responses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${uniqueModels}</div>
+                    <div class="stat-label">Unique Models</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${totalClusters}</div>
+                    <div class="stat-label">Clusters${hasUmapData ? ' (UMAP)' : ''}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${avgResponseLength}</div>
+                    <div class="stat-label">Avg. Response Length</div>
+                </div>
+            `;
+            
+            // Add UMAP availability indicator if clustering data exists
+            if (hasUmapData) {
+                statsHtml += `
+                    <div class="stat-card">
+                        <div class="stat-number">✓</div>
+                        <div class="stat-label">UMAP Available</div>
+                    </div>
+                `;
+            }
+            
+            statsContainer.innerHTML = statsHtml;
+        }
+
+        function populateAllResponses(responses) {
+            const container = document.getElementById('allResponsesContent');
+            container.innerHTML = '';
+
+            responses.forEach((response, index) => {
+                const responseCard = createResponseCard(response, index);
+                container.appendChild(responseCard);
+            });
+        }
+
+        function populateClusterSelect() {
+            const select = document.getElementById('clusterSelect');
+            select.innerHTML = '<option value="">Choose a cluster...</option>';
+            
+            Object.keys(clusters).forEach(clusterName => {
+                const option = document.createElement('option');
+                option.value = clusterName;
+                option.textContent = `${clusterName} (${clusters[clusterName].count} responses)`;
+                select.appendChild(option);
+            });
+        }
+
+        function handleClusterSelect(event) {
+            const clusterName = event.target.value;
+            const clusterContent = document.getElementById('clusterContent');
+            const clusterInfo = document.getElementById('clusterInfo');
+
+            if (!clusterName) {
+                clusterContent.innerHTML = '';
+                clusterInfo.style.display = 'none';
+                return;
+            }
+
+            const cluster = clusters[clusterName];
+            
+            // Show cluster info
+            clusterInfo.style.display = 'block';
+            clusterInfo.innerHTML = `
+                <strong>${clusterName}</strong> contains ${cluster.count} responses 
+                (Dominant model: ${cluster.dominantModel})
+            `;
+
+            // Show cluster responses
+            clusterContent.innerHTML = '';
+            cluster.responses.forEach((response, index) => {
+                const responseCard = createResponseCard(response, response.originalIndex);
+                clusterContent.appendChild(responseCard);
+            });
+        }
+
+        function createResponseCard(response, index) {
+            const card = document.createElement('div');
+            card.className = 'response-card';
+            
+            const modelConfig = response.metadata.model_config;
+            const temperature = modelConfig.temperature || 'N/A';
+            const modelName = modelConfig.model_name;
+            const uniqueName = response.unique_model_name;
+
+            card.innerHTML = `
+                <div class="response-header">
+                    <span>Response #${index + 1}</span>
+                    <span>${uniqueName}</span>
+                </div>
+                <div class="response-content">
+                    <div class="response-text">${response.response}</div>
+                    <div class="model-info">
+                        <strong>Model:</strong> ${modelName} | 
+                        <strong>Temperature:</strong> ${temperature} | 
+                        <strong>Instance:</strong> ${uniqueName}
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Mark corresponding button as active
+            // Find the button that corresponds to this tab
+            const buttons = document.querySelectorAll('.tab-button');
+            const tabNames = ['allResponses', 'clusterView', 'umapView'];
+            const tabIndex = tabNames.indexOf(tabName);
+            if (tabIndex >= 0 && buttons[tabIndex]) {
+                buttons[tabIndex].classList.add('active');
+            }
+        }
+
+        function loadNewFile() {
+            // Reset the interface
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('visualizerTabs').style.display = 'none';
+            document.getElementById('loadNewFile').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').textContent = '';
+            
+            // Clear UMAP chart
+            d3.select('#umapChart').selectAll('*').remove();
+            
+            // Remove any existing tooltips
+            d3.selectAll('.response-preview').remove();
+            
+            // Clear data
+            currentData = null;
+            clusters = {};
+        }
+
+        function showError(message) {
+            const uploadSection = document.getElementById('uploadSection');
+            const existingError = uploadSection.querySelector('.error-message');
+            
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            uploadSection.appendChild(errorDiv);
+        }
+
+        function initializeUmapVisualization(clusteringData) {
+            const container = d3.select('#umapChart');
+            container.selectAll('*').remove(); // Clear any existing content
+            
+            const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+            const width = 800 - margin.left - margin.right;
+            const height = 600 - margin.top - margin.bottom;
+            
+            // Create SVG
+            const svg = container.append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
+                
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            // Extract data points
+            const points = clusteringData.points;
+            
+            console.log('Clustering data:', clusteringData);
+            console.log('Points:', points);
+            
+            if (!points || points.length === 0) {
+                container.append('div')
+                    .style('text-align', 'center')
+                    .style('padding', '50px')
+                    .text('No UMAP data available for visualization.');
+                return;
+            }
+            
+            // Define distinct colors for clusters
+            const distinctColors = [
+                '#FF0000', '#0000FF', '#00FF00', '#FF8000', '#8000FF',
+                '#00FFFF', '#FF00FF', '#FFFF00', '#800000', '#000080',
+                '#008000', '#800080', '#808000', '#008080', '#FFA500', '#FF69B4'
+            ];
+            
+            const numClusters = clusteringData.num_clusters;
+            const colorScale = d3.scaleOrdinal()
+                .domain(d3.range(numClusters))
+                .range(distinctColors.slice(0, numClusters));
+            
+            // Create scales
+            const xExtent = d3.extent(points, d => d.umap_x);
+            const yExtent = d3.extent(points, d => d.umap_y);
+            
+            console.log('X extent:', xExtent);
+            console.log('Y extent:', yExtent);
+            console.log('Sample point coordinates:', points[0]);
+            
+            // Check for invalid coordinates
+            const validPoints = points.filter(p => 
+                p.umap_x !== undefined && p.umap_y !== undefined && 
+                !isNaN(p.umap_x) && !isNaN(p.umap_y)
+            );
+            console.log(`Valid points: ${validPoints.length}/${points.length}`);
+            
+            if (validPoints.length === 0) {
+                container.append('div')
+                    .style('text-align', 'center')
+                    .style('padding', '50px')
+                    .style('color', 'red')
+                    .text('Error: No valid UMAP coordinates found. Check console for details.');
+                return;
+            }
+            
+            const xScale = d3.scaleLinear()
+                .domain(xExtent)
+                .range([0, width])
+                .nice();
+                
+            const yScale = d3.scaleLinear()
+                .domain(yExtent)
+                .range([height, 0])
+                .nice();
+            
+            // Create axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(xScale))
+                .append('text')
+                .attr('x', width / 2)
+                .attr('y', 40)
+                .attr('fill', 'black')
+                .style('text-anchor', 'middle')
+                .text('UMAP Dimension 1');
+                
+            g.append('g')
+                .call(d3.axisLeft(yScale))
+                .append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -40)
+                .attr('x', -height / 2)
+                .attr('fill', 'black')
+                .style('text-anchor', 'middle')
+                .text('UMAP Dimension 2');
+            
+            // Create tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'response-preview')
+                .style('display', 'none');
+            
+            // Add points (use valid points only)
+            const pointsGroup = g.selectAll('.umap-point')
+                .data(validPoints)
+                .enter()
+                .append('g')
+                .attr('class', 'umap-point');
+            
+            // Add circles for regular points or stars for centers
+            pointsGroup.each(function(d, i) {
+                const group = d3.select(this);
+                const x = xScale(d.umap_x);
+                const y = yScale(d.umap_y);
+                
+                console.log(`Point ${i}:`, d, `-> x: ${x}, y: ${y}`);
+                
+                if (d.is_center) {
+                    // Create star shape for centers
+                    const star = group.append('path')
+                        .attr('d', d3.symbol().type(d3.symbolStar).size(200))
+                        .attr('transform', `translate(${x},${y})`)
+                        .attr('fill', colorScale(d.cluster_id))
+                        .attr('class', 'umap-center')
+                        .style('opacity', 0.9);
+                    console.log('Created star at:', x, y, 'for:', d.model_name);
+                } else {
+                    // Create circle for regular points
+                    const circle = group.append('circle')
+                        .attr('cx', x)
+                        .attr('cy', y)
+                        .attr('r', 6)
+                        .attr('fill', colorScale(d.cluster_id))
+                        .style('opacity', 0.8);
+                    console.log('Created circle at:', x, y, 'for:', d.model_name);
+                }
+                
+                // Add hover events
+                group
+                    .on('mouseover', function(event, d) {
+                        // Show tooltip
+                        const responsePreview = d.response_text.length > 200 
+                            ? d.response_text.substring(0, 200) + '...'
+                            : d.response_text;
+                            
+                        tooltip
+                            .style('display', 'block')
+                            .html(`
+                                <div class="model-name">${d.model_name}${d.is_center ? ' (Center)' : ''}</div>
+                                <div class="response-text">${responsePreview}</div>
+                            `)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 10) + 'px');
+                            
+                        // Highlight point
+                        d3.select(this).style('opacity', 1);
+                    })
+                    .on('mousemove', function(event) {
+                        tooltip
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 10) + 'px');
+                    })
+                    .on('mouseout', function() {
+                        tooltip.style('display', 'none');
+                        d3.select(this).style('opacity', d.is_center ? 0.9 : 0.8);
+                    });
+            });
+            
+            // Add a test circle to verify D3 is working
+            g.append('circle')
+                .attr('cx', 50)
+                .attr('cy', 50)
+                .attr('r', 10)
+                .attr('fill', 'red')
+                .attr('opacity', 0.5)
+                .attr('class', 'test-circle');
+            
+            console.log('Test circle added at (50, 50)');
+            
+            // Create legend
+            createUmapLegend(container, colorScale, numClusters);
+            
+            // Add title
+            svg.append('text')
+                .attr('x', (width + margin.left + margin.right) / 2)
+                .attr('y', margin.top / 2)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '16px')
+                .style('font-weight', 'bold')
+                .text(`UMAP Visualization - ${validPoints.length} responses, ${numClusters} clusters`);
+        }
+        
+        function createUmapLegend(container, colorScale, numClusters) {
+            const legend = container.append('div')
+                .attr('class', 'umap-legend');
+                
+            legend.append('h4')
+                .text('Legend:');
+                
+            const legendItems = legend.append('div');
+            
+            // Add cluster legend items
+            for (let i = 0; i < numClusters; i++) {
+                const item = legendItems.append('div')
+                    .attr('class', 'legend-item');
+                    
+                item.append('div')
+                    .attr('class', 'legend-color')
+                    .style('background-color', colorScale(i));
+                    
+                item.append('span')
+                    .text(`Cluster ${i + 1}`);
+            }
+            
+            // Add center legend
+            const centerItem = legendItems.append('div')
+                .attr('class', 'legend-item');
+                
+            centerItem.append('span')
+                .attr('class', 'legend-star')
+                .text('★');
+                
+            centerItem.append('span')
+                .text('Cluster Centers');
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .file-input-button:hover {
+            background: #5a6fd8;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .prompt-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .prompt-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .response-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .response-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .response-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .response-text {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .response-metadata {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            border-top: 2px solid #667eea;
+        }
+
+        .metadata-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .cluster-controls {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cluster-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            min-width: 150px;
+        }
+
+        .load-new-file-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .load-new-file-btn:hover {
+            background: #218838;
+        }
+
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .cluster-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .cluster-select {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Response Visualizer</h1>
+            <p>Visualize and analyze AI model responses from JSON log files</p>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h2>Upload JSON Log File</h2>
+            <p>Select a JSON file generated by the response generator to analyze the responses and clusters.</p>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" class="file-input" accept=".json" />
+                <button class="file-input-button">Choose File</button>
+            </div>
+            <div id="uploadStatus"></div>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('overview')">Overview</button>
+                <button class="tab" onclick="switchTab('clusters')">Cluster View</button>
+            </div>
+
+            <div class="cluster-controls">
+                <button class="load-new-file-btn" onclick="loadNewFile()">Load New File</button>
+            </div>
+
+            <div id="overviewTab" class="tab-content active">
+                <div id="statsSection" class="stats-section"></div>
+                <div id="promptSection" class="prompt-section"></div>
+                <div id="responsesSection" class="response-grid"></div>
+            </div>
+
+            <div id="clustersTab" class="tab-content">
+                <div class="cluster-controls">
+                    <label for="clusterSelect">Select Cluster:</label>
+                    <select id="clusterSelect" class="cluster-select" onchange="displayCluster()">
+                        <option value="">Choose a cluster...</option>
+                    </select>
+                </div>
+                <div id="clusterContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+        let clusters = [];
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    processData(data);
+                    displayUploadSuccess(file.name);
+                } catch (error) {
+                    displayError('Error parsing JSON file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processData(data) {
+            currentData = data;
+            
+            // Use real clustering data if available, otherwise generate mock clusters
+            if (data.clustering && data.clustering.clusters) {
+                clusters = data.clustering.clusters;
+            } else if (data.clusters) {
+                // Legacy format support
+                clusters = data.clusters;
+            } else {
+                generateMockClusters(data.responses);
+            }
+
+            displayMainContent();
+            displayStats();
+            displayPrompt();
+            displayAllResponses();
+            populateClusterDropdown();
+        }
+
+        function generateMockClusters(responses) {
+            // Simple clustering based on response length for demonstration
+            // In real implementation, this would use actual clustering data
+            const shortResponses = [];
+            const mediumResponses = [];
+            const longResponses = [];
+
+            responses.forEach((response, index) => {
+                const length = response.response.length;
+                const responseWithIndex = { ...response, originalIndex: index };
+                
+                if (length < 300) {
+                    shortResponses.push(responseWithIndex);
+                } else if (length < 600) {
+                    mediumResponses.push(responseWithIndex);
+                } else {
+                    longResponses.push(responseWithIndex);
+                }
+            });
+
+            clusters = [];
+            if (shortResponses.length > 0) {
+                clusters.push({
+                    name: 'Cluster 1 (Concise Responses)',
+                    responses: shortResponses
+                });
+            }
+            if (mediumResponses.length > 0) {
+                clusters.push({
+                    name: 'Cluster 2 (Medium Responses)',
+                    responses: mediumResponses
+                });
+            }
+            if (longResponses.length > 0) {
+                clusters.push({
+                    name: 'Cluster 3 (Detailed Responses)',
+                    responses: longResponses
+                });
+            }
+        }
+
+        function displayUploadSuccess(filename) {
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = `<div class="info-box">Successfully loaded: ${filename}</div>`;
+        }
+
+        function displayError(message) {
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = `<div class="error-box">${message}</div>`;
+        }
+
+        function displayMainContent() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('mainContent').classList.remove('hidden');
+        }
+
+        function displayStats() {
+            const statsSection = document.getElementById('statsSection');
+            const responses = currentData.responses;
+            const uniqueModels = [...new Set(responses.map(r => r.metadata.model_config.model_name))];
+            
+            let clusteringInfo = '';
+            if (currentData.clustering) {
+                const method = currentData.clustering.clustering_method || 'Unknown';
+                const distance = currentData.clustering.min_distance ? 
+                    ` (Min Distance: ${currentData.clustering.min_distance.toFixed(3)})` : '';
+                clusteringInfo = `<div class="stat-card">
+                    <div class="stat-number">${method.replace('_', ' ')}</div>
+                    <div class="stat-label">Clustering Method${distance}</div>
+                </div>`;
+            }
+            
+            statsSection.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${responses.length}</div>
+                    <div class="stat-label">Total Responses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${uniqueModels.length}</div>
+                    <div class="stat-label">Unique Models</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${clusters.length}</div>
+                    <div class="stat-label">Clusters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${new Date(currentData.timestamp).toLocaleDateString()}</div>
+                    <div class="stat-label">Generated Date</div>
+                </div>
+                ${clusteringInfo}
+            `;
+        }
+
+        function displayPrompt() {
+            const promptSection = document.getElementById('promptSection');
+            promptSection.innerHTML = `
+                <div class="prompt-title">Original Prompt:</div>
+                <div>"${currentData.prompt}"</div>
+            `;
+        }
+
+        function displayAllResponses() {
+            const responsesSection = document.getElementById('responsesSection');
+            const responsesHtml = currentData.responses.map((response, index) => 
+                createResponseCard(response, index + 1)
+            ).join('');
+            
+            responsesSection.innerHTML = responsesHtml;
+        }
+
+        function createResponseCard(response, number) {
+            const metadata = response.metadata;
+            const modelConfig = metadata.model_config;
+            
+            return `
+                <div class="response-card">
+                    <div class="response-text">${response.response}</div>
+                    <div class="response-metadata">
+                        <div class="metadata-item"><strong>Model:</strong> ${response.unique_model_name}</div>
+                        <div class="metadata-item"><strong>Base Model:</strong> ${modelConfig.model_name}</div>
+                        <div class="metadata-item"><strong>Temperature:</strong> ${modelConfig.temperature}</div>
+                        <div class="metadata-item"><strong>Max Tokens:</strong> ${modelConfig.max_tokens}</div>
+                        ${metadata.usage && metadata.usage.total_tokens ? 
+                            `<div class="metadata-item"><strong>Tokens Used:</strong> ${metadata.usage.total_tokens}</div>` : ''}
+                        <div class="metadata-item"><strong>Generated:</strong> ${new Date(metadata.timestamp).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateClusterDropdown() {
+            const select = document.getElementById('clusterSelect');
+            select.innerHTML = '<option value="">Choose a cluster...</option>';
+            
+            clusters.forEach((cluster, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = cluster.name;
+                select.appendChild(option);
+            });
+        }
+
+        function displayCluster() {
+            const select = document.getElementById('clusterSelect');
+            const clusterIndex = select.value;
+            const content = document.getElementById('clusterContent');
+
+            if (clusterIndex === '') {
+                content.innerHTML = '';
+                return;
+            }
+
+            const cluster = clusters[clusterIndex];
+            
+            // Handle different cluster formats
+            let clusterResponses = [];
+            if (cluster.responses && Array.isArray(cluster.responses)) {
+                // Real clustering data format or mock format
+                clusterResponses = cluster.responses;
+            }
+            
+            // Create response cards, ensuring we have the right metadata
+            const responsesHtml = clusterResponses.map((response, index) => {
+                // If this is from real clustering data, we need to get the full metadata
+                if (response.original_index !== undefined) {
+                    const fullResponse = currentData.responses[response.original_index];
+                    return createResponseCard(fullResponse, index + 1);
+                } else {
+                    // Mock format or already complete response
+                    return createResponseCard(response, index + 1);
+                }
+            }).join('');
+
+            let clusterInfo = cluster.name;
+            if (cluster.center_model && cluster.center_model !== 'unknown') {
+                clusterInfo += ` (Center: ${cluster.center_model})`;
+            }
+
+            content.innerHTML = `
+                <div class="info-box">
+                    <strong>${clusterInfo}</strong> - ${clusterResponses.length} response(s)
+                </div>
+                <div class="response-grid">
+                    ${responsesHtml}
+                </div>
+            `;
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function loadNewFile() {
+            // Reset everything
+            currentData = null;
+            clusters = [];
+            
+            // Show upload section
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('mainContent').classList.add('hidden');
+            
+            // Reset file input
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadStatus').innerHTML = '';
+            
+            // Reset to overview tab
+            switchTab('overview');
+        }
+    </script>
+</body>
+</html> 
