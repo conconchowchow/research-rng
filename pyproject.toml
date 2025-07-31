@@ -21,8 +21,8 @@ dependencies = [
     "aiofiles",
     "python-dotenv",
     "umap-learn",
-    "llvmlite",
-    "numba"
+    "llvmlite>=0.42.0",
+    "numba>=0.59.0"
 ]
 
 [dependency-groups]
