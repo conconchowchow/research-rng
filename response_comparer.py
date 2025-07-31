@@ -10,6 +10,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from typing import List, Tuple
+from response_comparer_utils import comparer_prompt, judger_prompt
 
 load_dotenv()
 
@@ -41,7 +42,7 @@ class DifferenceInspector:
                 {"role": "system", "content": comparer_system},
                 {"role": "user", "content": comparer_user},
             ],
-            temperature=temp,
+            temperature=self.temp,
         )
 
         print(f"comparer_response: {comparer_response.choices[0].message.content}")
@@ -53,125 +54,10 @@ class DifferenceInspector:
                 {"role": "system", "content": judger_system},
                 {"role": "user", "content": judger_user},
             ],
-            temperature=temp,
+            temperature=self.temp,
         )
         print(f"comparer_response: {comparer_response.choices[0].message.content}")
         return str(judger_response.choices[0].message.content)
-
-def comparer_prompt(responses: List[str]) -> Tuple[str, str]:
-    system_output = """
-    You are an assistant that takes in the multiple responses from the user,
-    and then writes unique pros and cons for each of the models' responses relative to other responses.
-
-    ---
     
-    Here's a basic example below. Please use this output structure:
-
-    User input:
-    [response 1]
-    'hi'
-
-    [response 2]
-    'hello there'
-
-    Your output:
-    [response 1]
-    Pros:
-    1. shorter
-    Cons:
-    2. cold
-
-    [response 2]
-    Pros:
-    1. more formal
-    Cons:
-    2. longer
-
-    ---
-    """
-    user_output = ""
-    for i in range(len(responses)):
-        user_output += f"[response {i + 1}]\n\'" + responses[i] + "\'\n\n"
-
-    return system_output, user_output
-
-def judger_prompt(responses: List[str], pros_and_cons: str) -> Tuple[str, str]:
-    system_output = """
-    You are an assistant that takes in the multiple responses and the differences (pros and cons) from the user.
-    Using this, come up with the best response possible combining these responses. 
-
-    ---
+if __name__ == "__main__":
     
-    Here's a basic example below. Please use this output structure:
-
-    User input:
-    [response 1]
-    'hi'
-
-    [response 2]
-    'hello there'
-
-    [pros and cons]
-    [response 1]
-    Pros:
-    1. shorter
-    Cons:
-    2. cold
-
-    [response 2]
-    Pros:
-    1. more formal
-    Cons:
-    2. longer
-
-    Your output:
-    Hi there
-
-    ---
-    """
-    user_output = ""
-    for i in range(len(responses)):
-        response = str(responses[i].choices[0].message.content)
-        user_output += f"[response {i + 1}]\n\'" + response + "\'\n\n"
-    user_output += f"[pros and cons]\n" + pros_and_cons
-    return system_output, user_output
-
-list_of_responses = []
-
-comparer_system, comparer_user = comparer_prompt(list_of_responses)
-print(f"comparer_system: {comparer_system}")
-print(f"comparer_user: {comparer_user}")
-
-comparer_response = completion(
-          model="gpt-4.1-2025-04-14",
-          messages=[
-            {
-                "role": "system",
-                "content": comparer_system,
-            },
-            {
-                "role": "user",
-                "content": comparer_user,
-            },
-          ],
-          temperature=temp,
-    )
-
-judger_system, judger_user = judger_prompt(list_of_responses, str(comparer_response.choices[0].message.content))
-print(f"judger_system: {judger_system}")
-print(f"judger_user: {judger_user}")
-
-judger_response = completion(
-          model="gpt-4.1-2025-04-14",
-          messages=[
-            {
-                "role": "system",
-                "content": judger_system,
-            },
-            {
-                "role": "user",
-                "content": judger_user,
-            },
-          ],
-          temperature=temp,
-    )

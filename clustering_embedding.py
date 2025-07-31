@@ -56,10 +56,10 @@ def embedding_distance(p1: Tuple[np.ndarray, str], p2: Tuple[np.ndarray, str]) -
     
     return distance_value
 
-def repulsive_sampling_embedding(ensemble_data: List[Tuple[np.ndarray, str]], min_distance: float = 0.5) -> List[Tuple[np.ndarray, str]]:
-    desired_num_clusters = len(ensemble_data) // 2
+def repulsive_sampling_embedding(ensemble_data: List[Tuple[np.ndarray, str]], min_distance: float = 0.5, divisor_coefficient: float = 2) -> List[Tuple[np.ndarray, str]]:
+    desired_num_clusters = len(ensemble_data) // divisor_coefficient
 
-    min_distance = 1.
+    min_distance = 1.0
 
     centers = []
 
@@ -75,7 +75,7 @@ def repulsive_sampling_embedding(ensemble_data: List[Tuple[np.ndarray, str]], mi
 
     print(f"Final number of clusters: {len(centers)}")
     
-    return centers
+    return centers, min_distance
 
 def repulsive_sampling_embedding_impl(ensemble_data: List[Tuple[np.ndarray, str]], min_distance: float = 0.5) -> List[Tuple[np.ndarray, str]]:
     """
@@ -314,14 +314,14 @@ def generate_test_responses(provider: ModelProvider, use_api: bool = True) -> Tu
     
     return test_data, prompt_mapping, response_mapping
 
-def plot_clustering_results_embedding(ensemble_data: List[Tuple[np.ndarray, str]], 
+def plot_clustering_results_embedding(responses: List[Tuple[str, str]], 
                                     clusters: List[Tuple[Tuple[np.ndarray, str], Tuple[Tuple[np.ndarray, str], ...]]], 
                                     min_distance: float, title: str, trial_folder: str):
     """
     Plot the clustering results for embedding data.
     
     Args:
-        ensemble_data: Original data points
+        responses: Original response data as (response_text, model_name) tuples
         clusters: Clustered data with centers and assigned points
         min_distance: The minimum distance used for clustering
         title: Title for the clustering method
@@ -329,31 +329,8 @@ def plot_clustering_results_embedding(ensemble_data: List[Tuple[np.ndarray, str]
     """
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
     
-    # Plot 1: Before clustering - show topics
-    # Count responses by topic (based on model name)
-    topic_counts = {"architecture": 0, "constitution": 0, "other": 0}
-    
-    for _, model_name in ensemble_data:
-        if "architecture" in model_name.lower():
-            topic_counts["architecture"] += 1
-        elif "constitution" in model_name.lower():
-            topic_counts["constitution"] += 1
-        else:
-            topic_counts["other"] += 1
-    
-    # Create bar chart for topics
-    topics = list(topic_counts.keys())
-    counts = list(topic_counts.values())
-    colors = ['skyblue', 'lightcoral', 'lightgreen']
-    
-    ax1.bar(topics, counts, color=colors, alpha=0.7, edgecolor='black')
-    ax1.set_ylabel('Number of Responses')
-    ax1.set_title(f'Before Clustering\n{len(ensemble_data)} Total Responses')
-    ax1.grid(True, alpha=0.3, axis='y')
-    
-    # Add count labels on bars
-    for i, count in enumerate(counts):
-        ax1.text(i, count + 0.1, str(count), ha='center', va='bottom', fontweight='bold')
+    # Create mapping from model names to response texts
+    model_to_response = {model_name: response_text for response_text, model_name in responses}
     
     # Plot 2: After clustering - show cluster composition
     cluster_labels = []
@@ -363,7 +340,13 @@ def plot_clustering_results_embedding(ensemble_data: List[Tuple[np.ndarray, str]
     
     for i, (center, assigned_points) in enumerate(clusters):
         cluster_size = len(assigned_points) + 1  # +1 for the center itself
-        cluster_labels.append(f'Cluster {i+1}\n(n={cluster_size})')
+        
+        # Get the center's response text and truncate for display
+        center_model_name = center[1]
+        center_response = model_to_response.get(center_model_name, center_model_name)
+        # Truncate to first 30 characters and add ellipsis if longer
+        truncated_response = center_response[:30] + "..." if len(center_response) > 30 else center_response
+        cluster_labels.append(f'{truncated_response}\n(n={cluster_size})')
         
         # Count topics in this cluster
         arch_count = 0
@@ -397,7 +380,7 @@ def plot_clustering_results_embedding(ensemble_data: List[Tuple[np.ndarray, str]
     x = np.arange(len(cluster_labels))
     width = 0.6
     
-    p1 = ax2.bar(x, architecture_counts, width, label='Architecture', color='skyblue', alpha=0.7)
+    p1 = ax2.bar(x, architecture_counts, width, color='skyblue', alpha=0.7)
     p2 = ax2.bar(x, constitution_counts, width, bottom=architecture_counts, 
                  label='Constitution', color='lightcoral', alpha=0.7)
     p3 = ax2.bar(x, other_counts, width, 
@@ -422,7 +405,6 @@ def plot_clustering_results_embedding(ensemble_data: List[Tuple[np.ndarray, str]
     
     # Print clustering summary
     print(f"\nClustering Summary ({title}):")
-    print(f"Original data points: {len(ensemble_data)}")
     print(f"Number of clusters: {len(clusters)}")
     print(f"Minimum distance: {min_distance:.3f}")
     print(f"\nCluster details:")
@@ -875,7 +857,7 @@ def main():
     
     # Perform repulsive sampling
     print("\nPerforming repulsive sampling clustering...")
-    centers = repulsive_sampling_embedding(test_data, min_distance=MIN_DISTANCE)
+    centers, distance = repulsive_sampling_embedding(test_data, min_distance=MIN_DISTANCE)
     clusters = assign_to_clusters_embedding(test_data, centers)
     plot_clustering_results_embedding(test_data, clusters, MIN_DISTANCE, "Repulsive Clustering", trial_folder)
     plot_clustering_results_by_response(test_data, clusters, MIN_DISTANCE, "Repulsive Clustering", trial_folder, response_mapping)

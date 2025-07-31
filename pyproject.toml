@@ -3,11 +3,11 @@ name = "research-rng"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.9"
 dependencies = [
-    "scipy>=1.16.0",
-    "google-generativeai>=0.8.0",
-    "numpy>=1.21.0",
+    "scipy",
+    "google-generativeai",
+    "numpy",
     "matplotlib",
     "dotenv",
     "litellm",
@@ -19,7 +19,7 @@ dependencies = [
     "jupyter",
     "ipywidgets",
     "aiofiles",
-    "python-dotenv"
+    "python-dotenv",
 ]
 
 [dependency-groups]
